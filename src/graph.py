@@ -44,7 +44,18 @@ line2, = ax.plot(data2, label="Sensor 2")
 ax.set_ylim(0, 2000)
 ax.set_ylabel("Distancia (mm)")
 ax.set_xlabel("Tiempo (muestras)")
-ax.legend()
+ax.legend(loc='lower right')
+
+# Variables para almacenar los valores más recientes
+current_d1 = 0.0
+current_d2 = 0.0
+
+# Crear textbox para mostrar valores actuales
+# Posicionado en la esquina superior derecha de la gráfica
+textbox = ax.text(0.98, 0.98, '', transform=ax.transAxes,
+                  verticalalignment='top', horizontalalignment='right',
+                  bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8),
+                  fontsize=11, family='monospace')
 
 last_update_time = time.time()
 consecutive_errors = 0
@@ -55,6 +66,10 @@ while True:
         # Verificar conexión y reconectar si es necesario
         if ser is None or not ser.is_open:
             if not connect_serial():
+                # Mostrar estado de conexión en textbox
+                textbox.set_text(f'Sensor 1: {current_d1:.1f} mm\n'
+                               f'Sensor 2: {current_d2:.1f} mm\n'
+                               f'[Sin conexión - Reintentando...]')
                 time.sleep(RECONNECT_DELAY)
                 plt.pause(0.1)  # mantener la gráfica viva
                 continue
@@ -65,6 +80,10 @@ while True:
         except serial.SerialTimeoutException:
             # Timeout normal, continuar sin actualizar datos
             consecutive_errors = 0
+            # Mantener textbox actualizado
+            textbox.set_text(f'Sensor 1: {current_d1:.1f} mm\n'
+                           f'Sensor 2: {current_d2:.1f} mm\n'
+                           f'[Timeout]')
             plt.pause(0.01)
             continue
         except serial.SerialException:
@@ -77,6 +96,10 @@ while True:
                     pass
             ser = None
             consecutive_errors = 0
+            # Mostrar estado de desconexión en textbox
+            textbox.set_text(f'Sensor 1: {current_d1:.1f} mm\n'
+                           f'Sensor 2: {current_d2:.1f} mm\n'
+                           f'[Desconectado - Reconectando...]')
             plt.pause(0.1)
             continue
 
@@ -85,6 +108,10 @@ while True:
             if consecutive_errors > MAX_CONSECUTIVE_ERRORS:
                 print("Muchas líneas vacías. Verificando conexión...")
                 consecutive_errors = 0
+            # Actualizar textbox incluso sin nuevos datos
+            textbox.set_text(f'Sensor 1: {current_d1:.1f} mm\n'
+                           f'Sensor 2: {current_d2:.1f} mm\n'
+                           f'[Sin datos nuevos]')
             plt.pause(0.01)
             continue
 
@@ -105,6 +132,10 @@ while True:
                 if d2 == 0 or d2 > 8200:
                     d2 = data2[-1] if len(data2) > 0 else 0
 
+                # Guardar valores actuales
+                current_d1 = d1
+                current_d2 = d2
+
                 data1.append(d1)
                 data2.append(d2)
 
@@ -116,6 +147,10 @@ while True:
                     ymin = min(min(data1), min(data2)) - 50
                     ymax = max(max(data1), max(data2)) + 50
                     ax.set_ylim(max(ymin, 0), min(ymax, 2000))
+
+                # Actualizar textbox con valores actuales
+                textbox.set_text(f'Sensor 1: {current_d1:.1f} mm\n'
+                               f'Sensor 2: {current_d2:.1f} mm')
 
                 last_update_time = time.time()
             except (ValueError, IndexError) as e:
