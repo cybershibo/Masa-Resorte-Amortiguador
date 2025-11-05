@@ -238,10 +238,13 @@ data2 = deque([0]*100, maxlen=100)
 line1, = ax.plot(data1, label="Sensor 1")
 line2, = ax.plot(data2, label="Sensor 2")
 
-ax.set_ylim(0, 2000)
-ax.set_ylabel("Distancia (mm)")
+# Configurar eje Y centrado en 0
+ax.set_ylim(-500, 500)  # Rango inicial centrado en 0
+ax.set_ylabel("Distancia relativa (mm)")
 ax.set_xlabel("Tiempo (muestras)")
+ax.axhline(y=0, color='gray', linestyle='--', linewidth=0.8, alpha=0.5)  # Línea de referencia en 0
 ax.legend(loc='lower right')
+ax.grid(True, alpha=0.3, linestyle='--')  # Cuadrícula para facilitar lectura
 
 # Variables para almacenar los valores más recientes
 current_d1 = 0.0
@@ -251,7 +254,7 @@ current_d2 = 0.0
 # Posicionado en la esquina superior derecha de la gráfica
 textbox = ax.text(0.98, 0.98, 'Inicializando...', transform=ax.transAxes,
                   verticalalignment='top', horizontalalignment='right',
-                  bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8),
+                  bbox=dict(boxstyle='round', facecolor='white', alpha=0.8),
                   fontsize=11, family='monospace')
 
 # Optimización: Habilitar blitting para actualizar solo las partes que cambian
@@ -473,14 +476,26 @@ while True:
                 line1.set_ydata(data1)
                 line2.set_ydata(data2)
 
-                # Actualizar límites del eje Y solo si hay datos válidos
+                # Actualizar límites del eje Y centrado en 0
                 ylim_changed = False
                 if len(data1) > 0 and len(data2) > 0:
-                    ymin = min(min(data1), min(data2)) - 50
-                    ymax = max(max(data1), max(data2)) + 50
+                    # Calcular rango de datos
+                    data_min = min(min(data1), min(data2))
+                    data_max = max(max(data1), max(data2))
+                    
+                    # Calcular el rango máximo (absoluto) para mantener el 0 centrado
+                    max_range = max(abs(data_min), abs(data_max)) + 50  # Margen de 50
+                    
+                    # Asegurar un mínimo razonable para el rango
+                    max_range = max(max_range, 100)  # Mínimo de ±100 mm
+                    
+                    # Limitar el rango máximo para evitar escalas excesivas
+                    max_range = min(max_range, 1000)  # Máximo de ±1000 mm
+                    
                     old_ylim = ax.get_ylim()
-                    new_ylim = (max(ymin, 0), min(ymax, 2000))
-                    if old_ylim != new_ylim:
+                    new_ylim = (-max_range, max_range)
+                    
+                    if abs(old_ylim[0] - new_ylim[0]) > 10 or abs(old_ylim[1] - new_ylim[1]) > 10:
                         ax.set_ylim(new_ylim)
                         ylim_changed = True
 
