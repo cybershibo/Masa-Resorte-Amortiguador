@@ -249,7 +249,7 @@ line1, = ax.plot(data1, label="Sensor 1")
 line2, = ax.plot(data2, label="Sensor 2")
 
 # Configurar eje Y centrado en 0
-ax.set_ylim(-500, 500)  # Rango inicial centrado en 0
+ax.set_ylim(-75, 75)  # Rango inicial centrado en 0
 ax.set_ylabel("Distancia relativa (mm)")
 ax.set_xlabel("Tiempo (muestras)")
 ax.axhline(y=0, color='gray', linestyle='--', linewidth=0.8, alpha=0.5)  # Línea de referencia en 0
@@ -497,10 +497,10 @@ while True:
                     max_range = max(abs(data_min), abs(data_max)) + 50  # Margen de 50
                     
                     # Asegurar un mínimo razonable para el rango
-                    max_range = max(max_range, 100)  # Mínimo de ±100 mm
+                    max_range = max(max_range, 10)  # Mínimo de ±100 mm
                     
                     # Limitar el rango máximo para evitar escalas excesivas
-                    max_range = min(max_range, 1000)  # Máximo de ±1000 mm
+                    max_range = min(max_range, 100)  # Máximo de ±1000 mm
                     
                     old_ylim = ax.get_ylim()
                     new_ylim = (-max_range, max_range)

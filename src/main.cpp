@@ -12,7 +12,7 @@ bool sensor2_ok = false;
 
 // Variables para calibración inicial (estado de reposo)
 const int CALIBRATION_SAMPLES = 5;  // Número de muestras para calcular el promedio inicial
-const int SMOOTH_WINDOW = 5; // Tamaño de la ventana de suavizado
+const int SMOOTH_WINDOW = 2; // Tamaño de la ventana de suavizado
 int16_t offset_d1 = 0;  // Offset del sensor 1 (promedio inicial)
 int16_t offset_d2 = 0;  // Offset del sensor 2 (promedio inicial)
 bool calibration_complete = false;  // Flag para indicar si la calibración está completa
@@ -187,9 +187,9 @@ void loop() {
       int16_t d2_final = (int16_t)d2_smooth - offset_d2;
       
       // Enviar valores relativos (pueden ser negativos si están más cerca que el estado de reposo)
-      Serial.print(d1_final);
+      Serial.print(d1_final * 0.92f);
       Serial.print(",");
-      Serial.println(-d2_final);
+      Serial.println(-d2_final * 0.92f);
       
       // Forzar envío inmediato para evitar pérdida de datos
       Serial.flush();
