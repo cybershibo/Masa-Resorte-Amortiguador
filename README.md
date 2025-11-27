@@ -4,7 +4,7 @@ Este programa funciona **exclusivamente en Windows** y requiere Python **3.14** 
 
 ## Instalación de Python
 
-1. Descarga e instala Python para Windows desde la página oficial: [https://www.python.org/downloads/windows/](https://www.python.org/downloads/windows/) 
+1. Descarga e instala Python para Windows desde la página oficial: [https://www.python.org/downloads/windows/](https://www.python.org/downloads/windows/)
 
 **Asegúrate de marcar la opción "Add Python to PATH" durante la instalación.**
 
@@ -29,6 +29,7 @@ El resultado esperado debe ser similar a:
 ```bash
 Python 3.10.0
 ```
+
 **O una versión superior a 3.10.**
 
 3. Actualiza `pip` (el gestor de paquetes de Python) con el comando: 
@@ -85,4 +86,26 @@ La generación y registro de datos es completamente automática, y el archivo se
 
 ## Esquemático
 
+El prototipo se basa en un microcontrolador STM32F411CEU6, específicamente en la placa de desarrollo WeeAct Blackpill 3.0. Los sensores utilizados son los VL53L0X de Adafruit.
+
 ![Diagrama](./img/esquematico.png)
+
+## Codigo de colores
+
+Cada sensor tiene 6 pines, sin embargo, solo 5 se utilizan:
+
+- VIN: Voltaje de entrada, 3.3V
+- GND: Tierra/Común
+- SCL: Reloj I2C
+- SDA: Datos I2C
+- GPIO1: Sin uso
+- XSHUT: Selección de sensor (ENABLE)
+
+| Pin del sensor | Color       | Pin del microcontrolador |
+|----------------|-------------|--------------------------|
+| VIN            | Rojo        | 3.3V                     |
+| GND            | Negro       | GND                      |
+| SCL            | Verde       | SCL (PB6)                |
+| SDA            | Amarillo    | SDA (PB7)                |
+| GPIO1          | N/A         | — (sin conexión)         |
+| XSHUT          | Blanco      | PA1/PA0                  |
